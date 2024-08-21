@@ -1,8 +1,12 @@
 <template>
   <div class="container">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav
+      class="navbar navbar-expand-lg bg-body-tertiary m-auto col-9 rounded shadow-sm mb-4"
+    >
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="#">
+          <span class="logo">f</span>
+        </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -17,10 +21,62 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
+              <router-link
+                to="/"
+                class="nav-link active d-flex align-items-center"
+                aria-current="page"
+                href="#"
+              >
+                <div class="icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-house-door-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5"
+                    />
+                  </svg>
+                </div>
+                <span class="home mt-1 mx-1">Home</span></router-link
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
+              <router-link
+                to="/profile"
+                class="nav-link active d-flex align-items-center"
+                aria-current="page"
+                href="#"
+              >
+                <div class="icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-person-circle"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                    <path
+                      fill-rule="evenodd"
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
+                    />
+                  </svg>
+                </div>
+                <span class="home mt-1 mx-1">Profile</span></router-link
+              >
+            </li>
+          </ul>
+          <ul class="btns">
+            <li class="btn btn-outline-primary me-2 btn-sm">
+              <router-link to="/login">Login</router-link>
+            </li>
+            <li class="btn btn-outline-primary btn-sm">
+              <router-link to="/register">Register</router-link>
             </li>
           </ul>
         </div>
@@ -28,3 +84,97 @@
     </nav>
   </div>
 </template>
+<style lang="scss">
+$main-color: #0080ff;
+.navbar {
+  .navbar-toggler {
+    &:focus {
+      box-shadow: 0 0px 3px 1px $main-color !important;
+    }
+  }
+  .navbar-brand {
+    .logo {
+      text-align: center;
+      font-weight: 700;
+      color: $main-color;
+      display: block;
+      width: 30px;
+      height: 30px;
+      border: 1px solid #0080ff;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    &:hover {
+      .logo {
+        color: #fff;
+        background-color: $main-color;
+      }
+    }
+  }
+  .nav-item {
+    position: relative;
+    font-weight: 500;
+    .router-link-active {
+      color: $main-color !important;
+    }
+    &::before {
+      content: "";
+      opacity: 0;
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      bottom: -18px;
+      background: $main-color;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+    &:hover {
+      &::before {
+        opacity: 1;
+      }
+    }
+    .icon {
+      color: $main-color;
+    }
+  }
+  .btns {
+    .btn {
+      font-weight: 500;
+      transition: 0.3s;
+      a {
+        text-decoration: none;
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
+  }
+  @media (max-width: 991px) {
+    .nav-item {
+      margin-bottom: 10px;
+      .nav-link {
+        justify-content: center;
+      }
+      &::before {
+        width: 80px;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+      }
+    }
+  }
+  @media (min-width: 992px) {
+    .nav-item {
+      margin-bottom: 10px;
+      .nav-link {
+        justify-content: center;
+      }
+      &::before {
+        width: 100%;
+        left: 0;
+        transform: translateX(0);
+      }
+    }
+  }
+}
+</style>
