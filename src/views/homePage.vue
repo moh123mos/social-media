@@ -1,6 +1,8 @@
 <template>
+  <navBar></navBar>
   <div class="container">
     <div class="posts m-auto col-9">
+      <addPost></addPost>
       <div
         v-for="post in posts"
         :key="post.id"
@@ -87,8 +89,9 @@
 </template>
 
 <script setup>
+import navBar from "@/components/navBar.vue";
 import { ref, onMounted } from "vue";
-
+import addPost from "@/components/addPost.vue";
 let url = ref({
   posts: "https://tarmeezacademy.com/api/v1/posts?limit=15",
 });

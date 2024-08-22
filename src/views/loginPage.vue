@@ -1,4 +1,5 @@
 <template>
+  <navBar></navBar>
   <section class="p-3 p-md-4 p-xl-5">
     <div class="container">
       <div class="card border-light-subtle m-auto col-9">
@@ -145,6 +146,8 @@ import router from "@/router";
 import axios from "axios";
 import { ref } from "vue";
 import { useStore } from "vuex";
+import navBar from "@/components/navBar.vue";
+
 let invalidUsername = ref(null);
 let invalidPassword = ref(null);
 let invalidEmail = ref(null);

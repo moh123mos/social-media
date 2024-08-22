@@ -1,12 +1,11 @@
 <template>
-  <navBar></navBar>
+  <!-- <navBar></navBar> -->
   <router-view></router-view>
 </template>
 <script setup>
 import { onMounted } from "vue";
-import navBar from "./components/navBar.vue";
+// import navBar from "./components/navBar.vue";
 import { useStore } from "vuex";
-
 onMounted(() => {
   const store = useStore();
   if (localStorage.getItem("userData")) store.dispatch("login");

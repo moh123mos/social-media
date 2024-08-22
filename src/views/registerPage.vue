@@ -1,4 +1,5 @@
 <template>
+  <navBar></navBar>
   <section class="p-3 p-md-4 p-xl-5">
     <div class="container">
       <div class="card border-light-subtle m-auto col-9">
@@ -228,6 +229,8 @@
 </template>
 
 <script setup>
+import navBar from "@/components/navBar.vue";
+
 import router from "@/router";
 import axios from "axios";
 import { ref } from "vue";
@@ -252,10 +255,7 @@ const loginVx = () => {
   store.dispatch("login");
 };
 const register = () => {
-  body.value.name += body.value.lastName;
-  const myHeaders = new Headers();
-  myHeaders.append("Accept", "application/json");
-
+  body.value.name += " " + body.value.lastName;
   const formdata = new FormData();
   formdata.append("username", body.value.username);
   formdata.append("password", body.value.password);
@@ -264,25 +264,8 @@ const register = () => {
   if (body.value.profile_image != "")
     formdata.append("image", body.value.profile_image);
 
-  // const requestOptions = {
-  //   method: "POST",
-  //   headers: myHeaders,
-  //   body: formdata,
-  //   redirect: "follow",
-  // };
-  // fetch("https://tarmeezacademy.com/api/v1/register", requestOptions)
-  //   .then((response) => {
-  //     return response.json();
-  //   })
-  //   .then((result) => {
-  //     console.log(result);
-  //     localStorage.setItem("userData", JSON.stringify(result));
-  //     loginVx();
-  //     router.push("/");
-  //   })
-  //   .catch((error) => console.error(error));
   axios
-    .post("https://tarmeezacademy.com/api/v1/register", formdata, myHeaders)
+    .post("https://tarmeezacademy.com/api/v1/register", formdata)
     .then((res) => {
       console.log(res.data);
       localStorage.setItem("userData", JSON.stringify(res.data));
@@ -302,32 +285,9 @@ const getFile = (e) => {
   let file = e.target.files;
   if (file.length > 0) {
     body.value.profile_image = file[0];
-    console.log(body.value.profile_image);
+    // console.log(body.value.profile_image);
   }
 };
-
-// let getFile = (event) => {
-//   const file = event.target.files[0]; // Get the selected file
-//   if (file) {
-//     const reader = new FileReader();
-
-//     // Read the file as a Data URL (Base64 string)
-//     reader.onload = (e) => {
-//       const base64Image = e.target.result;
-//       // Store the Base64 string in localStorage
-//       localStorage.setItem("uploadedImage", base64Image);
-//       // Update the storedImage data property to display the image
-//       body.value.profile_image = base64Image;
-//     };
-
-//     reader.readAsDataURL(file); // Trigger the reading of the file
-//     // console.log(reader.readAsDataURL(file));
-//     console.log(reader);
-//     console.log(file);
-//     body.value.profile_image = localStorage.getItem("uploadedImage");
-//     console.log(body.value.profile_image);
-//   }
-// };
 </script>
 
 <style lang="scss" scoped>

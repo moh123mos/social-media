@@ -72,19 +72,27 @@
         </ul>
         <ul class="btns mb-0">
           <div v-if="isLoggedIn" class="logedIn d-flex">
-            <li class="profile-img me-2">
+            <router-link to="/profile" class="profile-img me-2">
               <img
-                :src="
-                  setImgProfile
-                    ? setImgProfile
-                    : '../assets/profileImg/userMan.png'
+                v-if="
+                  '{}' !== JSON.stringify(userProfile) &&
+                  JSON.stringify(userProfile) !== 'null'
                 "
+                :src="userProfile"
                 width="40px"
                 height="40px"
                 class="rounded-circle"
                 alt=""
               />
-            </li>
+              <img
+                v-else
+                src="../assets/profileImg/userMan.png"
+                width="40px"
+                height="40px"
+                class="rounded-circle"
+                alt=""
+              />
+            </router-link>
             <li class="">
               <a
                 class="btn btn-outline-danger btn-sm logout-btn"
@@ -108,7 +116,7 @@
 </template>
 <script setup>
 import { useStore } from "vuex";
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 
 const store = useStore();
 const isLoggedIn = computed(() => store.getters.isLoggedIn);
@@ -120,29 +128,14 @@ let clearData = () => {
   localStorage.setItem("userData", "");
   logout();
 };
-// the remain problem is make profile img change when login or register
-let setImgProfile = ref(null);
-const loadUser = () => {
-  const userData = localStorage.getItem("userData"); // Retrieve the data as a string
-  if (userData) {
-    if (
-      JSON.parse(userData).user.profile_image === null ||
-      JSON.stringify(JSON.parse(userData).user.profile_image) === "{}"
-    ) {
-      setImgProfile.value =
-        "http://tarmeezacademy.com/images/users/VYJV2c2JOEilBmP.jpg";
-    } else {
-      setImgProfile.value = JSON.parse(userData).user.profile_image;
-    }
-    console.log(setImgProfile.value);
-  } else {
-    setImgProfile.value =
-      "http://tarmeezacademy.com/images/users/VYJV2c2JOEilBmP.jpg";
-  }
-};
-onMounted(() => {
-  loadUser();
-});
+// TODO the remain problem is make profile img change when login or register without reload page
+const username = ref(null);
+const userProfile = ref(null);
+const userData = localStorage.getItem("userData");
+if (userData) {
+  username.value = JSON.parse(userData).user.name;
+  userProfile.value = JSON.parse(userData).user.profile_image;
+}
 </script>
 <style lang="scss">
 $main-color: #0080ff;
