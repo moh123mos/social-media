@@ -69,7 +69,11 @@
                   </div>
                   <div class="col-12">
                     <div class="d-grid">
-                      <button class="btn bsb-btn-xl btn-primary" type="submit">
+                      <button
+                        to="/"
+                        class="btn bsb-btn-xl btn-primary"
+                        type="submit"
+                      >
                         Sign in
                       </button>
                     </div>
@@ -137,20 +141,30 @@
 </template>
 
 <script setup>
+import router from "@/router";
 import axios from "axios";
 import { ref } from "vue";
+import { useStore } from "vuex";
 let invalidUsername = ref(null);
 let invalidPassword = ref(null);
 let invalidEmail = ref(null);
 const body = ref({
-  username: "",
-  password: "",
+  username: "moh289mos",
+  password: "moh289mos",
 });
+
+const store = useStore();
+const loginVx = () => {
+  store.dispatch("login");
+};
 const login = () => {
   axios
     .post("https://tarmeezacademy.com/api/v1/login", body.value)
     .then((res) => {
       console.log(res.data);
+      localStorage.setItem("userData", JSON.stringify(res.data));
+      loginVx();
+      router.push("/");
     })
     .catch((error) => {
       console.log(error.response.data.errors);
@@ -168,8 +182,22 @@ const login = () => {
   margin-left: 10px;
   color: #eb4941;
   font-weight: bold;
+  animation-name: opcityAnimation;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
 }
 .side-section {
   background-color: #1877f2 !important;
+}
+@keyframes opcityAnimation {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>

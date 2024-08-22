@@ -37,8 +37,10 @@
                   </div>
                 </div>
               </div>
+              <!-- this is main form -->
               <form action="#!" @submit.prevent="register">
                 <div class="row gy-3 gy-md-4 overflow-hidden">
+                  <!-- name -->
                   <div class="col-12">
                     <label for="firstName" class="form-label"
                       >First Name <span class="text-danger">*</span></label
@@ -53,6 +55,7 @@
                     />
                     <div class="message-invalid" ref="invalidName"></div>
                   </div>
+                  <!-- lastname -->
                   <div class="col-12">
                     <label for="lastName" class="form-label">Last Name</label>
                     <input
@@ -64,6 +67,7 @@
                       v-model="body.lastName"
                     />
                   </div>
+                  <!-- email -->
                   <div class="col-12">
                     <label for="email" class="form-label"
                       >Email <span class="text-danger">*</span></label
@@ -78,6 +82,7 @@
                     />
                     <div class="message-invalid" ref="invalidEmail"></div>
                   </div>
+                  <!-- username -->
                   <div class="col-12">
                     <label for="username" class="form-label"
                       >Username <span class="text-danger">*</span></label
@@ -92,6 +97,7 @@
                     />
                     <div class="message-invalid" ref="invalidUsername"></div>
                   </div>
+                  <!-- password -->
                   <div class="col-12">
                     <label for="password" class="form-label"
                       >Password <span class="text-danger">*</span></label
@@ -105,6 +111,7 @@
                     />
                     <div class="message-invalid" ref="invalidPassword"></div>
                   </div>
+                  <!-- profile-img -->
                   <div class="col-12">
                     <label for="image" class="form-label">Profile Image</label>
                     <input
@@ -116,6 +123,7 @@
                       ref="imgFile"
                     />
                   </div>
+                  <!-- terms and conditions -->
                   <div class="col-12">
                     <div class="form-check">
                       <input
@@ -136,6 +144,7 @@
                       </label>
                     </div>
                   </div>
+                  <!-- submit data  -->
                   <div class="col-12">
                     <div class="d-grid">
                       <button class="btn bsb-btn-xl btn-primary" type="submit">
@@ -219,29 +228,66 @@
 </template>
 
 <script setup>
+import router from "@/router";
 import axios from "axios";
 import { ref } from "vue";
+import { useStore } from "vuex";
 // handle errors
 let invalidName = ref(null);
 let invalidEmail = ref(null);
 let invalidUsername = ref(null);
 let invalidPassword = ref(null);
 const body = ref({
-  name: "",
   lastName: "",
-  email: "",
-  username: "",
-  password: "",
-  img: {},
+  name: `Mohamed`,
+  email: "Mohamed9@gil.cm",
+  username: "molioa1",
+  password: "123456",
+  profile_image: "",
 });
 let imgFile = ref(null);
+
+const store = useStore();
+const loginVx = () => {
+  store.dispatch("login");
+};
 const register = () => {
-  console.log(body.value);
+  body.value.name += body.value.lastName;
+  const myHeaders = new Headers();
+  myHeaders.append("Accept", "application/json");
+
+  const formdata = new FormData();
+  formdata.append("username", body.value.username);
+  formdata.append("password", body.value.password);
+  formdata.append("name", body.value.name);
+  formdata.append("email", body.value.email);
+  if (body.value.profile_image != "")
+    formdata.append("image", body.value.profile_image);
+
+  // const requestOptions = {
+  //   method: "POST",
+  //   headers: myHeaders,
+  //   body: formdata,
+  //   redirect: "follow",
+  // };
+  // fetch("https://tarmeezacademy.com/api/v1/register", requestOptions)
+  //   .then((response) => {
+  //     return response.json();
+  //   })
+  //   .then((result) => {
+  //     console.log(result);
+  //     localStorage.setItem("userData", JSON.stringify(result));
+  //     loginVx();
+  //     router.push("/");
+  //   })
+  //   .catch((error) => console.error(error));
   axios
-    .post("https://tarmeezacademy.com/api/v1/register", body.value)
+    .post("https://tarmeezacademy.com/api/v1/register", formdata, myHeaders)
     .then((res) => {
-      console.log(res.data.user);
-      console.log(res.data.token);
+      console.log(res.data);
+      localStorage.setItem("userData", JSON.stringify(res.data));
+      loginVx();
+      router.push("/");
     })
     .catch((error) => {
       console.log(error.response.data.errors);
@@ -252,12 +298,36 @@ const register = () => {
       invalidPassword.value.innerHTML = errors.password || " ";
     });
 };
-const getFile = () => {
-  if (imgFile.value.files.length > 0) {
-    body.value.img = imgFile.value.files[0];
-    console.log(body.value.img);
+const getFile = (e) => {
+  let file = e.target.files;
+  if (file.length > 0) {
+    body.value.profile_image = file[0];
+    console.log(body.value.profile_image);
   }
 };
+
+// let getFile = (event) => {
+//   const file = event.target.files[0]; // Get the selected file
+//   if (file) {
+//     const reader = new FileReader();
+
+//     // Read the file as a Data URL (Base64 string)
+//     reader.onload = (e) => {
+//       const base64Image = e.target.result;
+//       // Store the Base64 string in localStorage
+//       localStorage.setItem("uploadedImage", base64Image);
+//       // Update the storedImage data property to display the image
+//       body.value.profile_image = base64Image;
+//     };
+
+//     reader.readAsDataURL(file); // Trigger the reading of the file
+//     // console.log(reader.readAsDataURL(file));
+//     console.log(reader);
+//     console.log(file);
+//     body.value.profile_image = localStorage.getItem("uploadedImage");
+//     console.log(body.value.profile_image);
+//   }
+// };
 </script>
 
 <style lang="scss" scoped>

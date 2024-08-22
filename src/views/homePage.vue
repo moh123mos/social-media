@@ -99,7 +99,7 @@ const fetchData = async () => {
     let res = await fetch(url.value.posts);
     let data = await res.json();
     posts.value = data.data;
-    console.log(posts.value);
+    // console.log(posts.value);
   } catch (error) {
     console.error("fetching error : " + error);
   }
