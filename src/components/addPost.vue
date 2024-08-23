@@ -70,11 +70,12 @@
 </template>
 
 <script setup>
-import { useStore } from "vuex";
-import { computed, ref } from "vue";
+import { userDataPublic } from "@/store/users";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
 import axios from "axios";
-const store = useStore();
-const isLoggedIn = computed(() => store.getters.isLoggedIn);
+const store = userDataPublic();
+const { isLoggedIn } = storeToRefs(store);
 const username = ref(null);
 const userProfile = ref(null);
 const userData = localStorage.getItem("userData");

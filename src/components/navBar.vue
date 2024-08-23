@@ -71,7 +71,7 @@
           </li>
         </ul>
         <ul class="btns mb-0">
-          <div v-if="isLoggedIn" class="logedIn d-flex">
+          <div v-if="isLoggedIn" class="logedIn d-flex justify-content-center">
             <router-link to="/profile" class="profile-img me-2">
               <img
                 v-if="
@@ -115,15 +115,16 @@
   </nav>
 </template>
 <script setup>
-import { useStore } from "vuex";
-import { computed, ref } from "vue";
+// import { useStore } from "vuex";
+import { ref } from "vue";
+import { userDataPublic } from "@/store/users";
+import { storeToRefs } from "pinia";
 
-const store = useStore();
-const isLoggedIn = computed(() => store.getters.isLoggedIn);
+const store = userDataPublic();
 
-const logout = () => {
-  store.dispatch("logout");
-};
+const { isLoggedIn } = storeToRefs(store);
+
+const logout = store.logout;
 let clearData = () => {
   localStorage.setItem("userData", "");
   logout();
@@ -147,6 +148,7 @@ dl {
 }
 .navbar {
   z-index: 5;
+  top: 0;
   .navbar-toggler {
     &:focus {
       box-shadow: 0 0px 3px 1px $main-color !important;

@@ -2,7 +2,7 @@
   <navBar></navBar>
   <section class="p-3 p-md-4 p-xl-5">
     <div class="container">
-      <div class="card border-light-subtle m-auto col-9">
+      <div class="card border-light-subtle m-auto col-9 w-100">
         <div class="row g-0">
           <div class="side-section col-12 col-md-6 text-bg-primary">
             <div class="d-flex align-items-center justify-content-center h-100">
@@ -232,9 +232,9 @@
 import navBar from "@/components/navBar.vue";
 
 import router from "@/router";
+import { userDataPublic } from "@/store/users";
 import axios from "axios";
 import { ref } from "vue";
-import { useStore } from "vuex";
 // handle errors
 let invalidName = ref(null);
 let invalidEmail = ref(null);
@@ -250,10 +250,8 @@ const body = ref({
 });
 let imgFile = ref(null);
 
-const store = useStore();
-const loginVx = () => {
-  store.dispatch("login");
-};
+const store = userDataPublic();
+const loginVx = store.login;
 const register = () => {
   body.value.name += " " + body.value.lastName;
   const formdata = new FormData();
@@ -292,6 +290,7 @@ const getFile = (e) => {
 
 <style lang="scss" scoped>
 .side-section {
+  border-radius: 5px;
   background-color: #1877f2 !important;
 }
 .message-invalid {

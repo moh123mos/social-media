@@ -1,9 +1,8 @@
 <template>
-  <DisplayPosts :posts="posts" :fromHome="true"></DisplayPosts>
-  <!-- <navBar></navBar>
+  <navBar></navBar>
   <div class="container">
     <div class="posts m-auto col-9">
-      <addPost></addPost>
+      <add-post v-if="fromHome"></add-post>
       <div
         v-for="(post, i) in posts"
         :key="post.id"
@@ -56,10 +55,18 @@
           <div class="card-title fw-bold">
             {{ post.title }}
           </div>
-          <div class="card-text mb-2">
+          <div
+            class="card-text mb-2"
+            :style="fromPost ? 'white-space: normal;' : 'white-space: nowarp;'"
+            @click="goToPostDetail(post)"
+          >
             {{ post.body }}
           </div>
-          <div class="card-img mb-3" @click="goToPostDetail(post)">
+          <div
+            class="card-img mb-3 h-100"
+            :style="fromPost ? '' : 'overflow: hidden; max-height: 300px'"
+            @click="goToPostDetail(post)"
+          >
             <img :src="post.image" class="rounded w-100" alt="" />
           </div>
           <hr />
@@ -113,9 +120,9 @@
                   />
                 </svg>
               </div>
-              <div class="comment">
-                <span class="no-comment">({{ post.comments_count }})</span
-                >Comment(s)
+              <div class="comment d-flex">
+                <span class="no-comment">({{ post.comments_count }})</span>
+                <div class="label">Comment(s)</div>
               </div>
             </div>
             <div class="share-post d-flex gap-2">
@@ -138,56 +145,150 @@
           </footer>
         </div>
       </div>
-      <div v-if="isloading" class="handle loading">Loading...</div>
-      <div v-if="hasError" class="handle bg-danger error">
-        <p>OOPs, Error on Fetching data...</p>
-        <p>please reload page</p>
-      </div>
     </div>
-  </div> -->
+  </div>
 </template>
 
 <script setup>
-import DisplayPosts from "@/components/displayPosts.vue";
-import { ref, onMounted, onBeforeUnmount } from "vue";
-
-let posts = ref([]);
-let page = ref(1);
-let lastPage = ref(0);
-let isloading = ref(false);
-let hasError = ref(false);
-// let store = userDataPublic();
-const fetchData = async (p = 1) => {
-  try {
-    isloading.value = true;
-    let res = await fetch(
-      `https://tarmeezacademy.com/api/v1/posts?limit=20&page=${p}`
-    );
-    let data = await res.json();
-    posts.value.push(...data.data);
-    isloading.value = false;
-    hasError.value = false;
-    console.log(data.meta);
-    lastPage.value = data.meta.last_page;
-  } catch (error) {
-    hasError.value = true;
-    console.error("fetching error : " + error);
-  }
-};
-const handleScroll = () => {
-  let isEnd =
-    window.scrollY + window.innerHeight >= document.body.scrollHeight - 200;
-  if (isEnd && page.value <= lastPage.value) {
-    console.log("the end of page");
-    fetchData(++page.value);
-  }
-};
-onMounted(() => {
-  fetchData();
-  window.addEventListener("scroll", handleScroll);
+import navBar from "@/components/navBar.vue";
+import AddPost from "./addPost.vue";
+import router from "@/router";
+import { userDataPublic } from "@/store/users";
+import { ref, defineProps } from "vue";
+const store = userDataPublic();
+defineProps({
+  posts: {
+    type: Array,
+    required: true,
+  },
+  fromHome: {
+    type: Boolean,
+  },
+  fromPost: {
+    type: Boolean,
+  },
 });
 
-onBeforeUnmount(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
+let toggleLike = (idx) => {
+  document
+    .querySelectorAll(".footer .like-post .fill")
+    .item(idx)
+    .classList.toggle("d-none");
+  document
+    .querySelectorAll(".footer .like-post .hand")
+    .item(idx)
+    .classList.toggle("d-none");
+  console.log(document.querySelectorAll(".footer .like-post .hand").item(idx));
+  console.log(document.querySelectorAll(".footer .like-post .fill").item(idx));
+  console.log(idx);
+};
+const goToPostDetail = (post) => {
+  router.push(`/posts/${post.id}`);
+  let arr = ref([]);
+  arr.value.push(post);
+  store.addUsers(arr.value);
+};
 </script>
+
+<style lang="scss">
+.posts {
+  .post {
+    .card-header {
+      .user-post {
+        .name {
+          font-weight: bold;
+        }
+        .user-name {
+          cursor: pointer;
+          font-weight: 700;
+          transition: 0.3s;
+          &:hover {
+            color: #042040;
+            text-decoration: underline;
+          }
+        }
+        .date-post {
+          font-size: 14px;
+          color: gray;
+          .icon {
+            transition: 0.3s;
+            &:hover {
+              color: #000;
+            }
+          }
+        }
+      }
+    }
+    .card-body {
+      .card-text {
+        color: gray;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        &.show {
+          white-space: normal !important;
+        }
+      }
+      .card-img {
+        // max-height: 300px;
+        // overflow: hidden;
+      }
+    }
+    footer {
+      color: #0080ff;
+      .icon svg {
+        font-weight: 900;
+      }
+      & > div {
+        cursor: pointer;
+        align-items: center;
+      }
+      .comment-post {
+        padding: 0 30px 0;
+        border-left: 2px solid #0080ff;
+        border-right: 2px solid #0080ff;
+      }
+    }
+  }
+  .handle {
+    text-align: center;
+    padding: 15px;
+    background: #0080ff;
+    border-radius: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+    line-height: 1;
+    .p {
+      margin: 0;
+    }
+  }
+}
+@media (max-width: 991px) {
+  .container {
+    margin-top: 75px !important;
+  }
+  .posts {
+    width: 100% !important;
+  }
+  .posts .post footer {
+    font-size: 12px;
+  }
+  .comment-post {
+    gap: 5px;
+    padding: 0 30px !important;
+    // border: none !important;
+  }
+  .like,
+  .comment .label,
+  .share {
+    display: none;
+  }
+}
+@media (min-width: 992px) {
+  .comment-post {
+    padding: 0 30px 0;
+  }
+}
+</style>

@@ -2,7 +2,7 @@
   <navBar></navBar>
   <section class="p-3 p-md-4 p-xl-5">
     <div class="container">
-      <div class="card border-light-subtle m-auto col-9">
+      <div class="card border-light-subtle m-auto col-9 w-100">
         <div class="row g-0">
           <div class="side-section col-12 col-md-6 text-bg-primary">
             <div class="d-flex align-items-center justify-content-center h-100">
@@ -145,7 +145,7 @@
 import router from "@/router";
 import axios from "axios";
 import { ref } from "vue";
-import { useStore } from "vuex";
+import { userDataPublic } from "@/store/users";
 import navBar from "@/components/navBar.vue";
 
 let invalidUsername = ref(null);
@@ -156,10 +156,8 @@ const body = ref({
   password: "moh289mos",
 });
 
-const store = useStore();
-const loginVx = () => {
-  store.dispatch("login");
-};
+const store = userDataPublic();
+const loginVx = store.login;
 const login = () => {
   axios
     .post("https://tarmeezacademy.com/api/v1/login", body.value)
@@ -191,6 +189,7 @@ const login = () => {
 }
 .side-section {
   background-color: #1877f2 !important;
+  border-radius: 5px;
 }
 @keyframes opcityAnimation {
   0% {

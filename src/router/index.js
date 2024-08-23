@@ -2,6 +2,7 @@ import HomePage from "@/views/homePage.vue";
 import ProfilePage from "@/views/profilePage.vue";
 import loginPage from "@/views/loginPage.vue";
 import RegisterPage from "@/views/registerPage.vue";
+import viewPost from "@/views/viewPost.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
@@ -35,6 +36,14 @@ const routes = [
     component: RegisterPage,
     meta: {
       title: "Register",
+    },
+  },
+  {
+    path: "/posts/:id",
+    name: "viewPost",
+    component: viewPost,
+    meta: {
+      title: "View Post",
     },
   },
 ];
