@@ -128,7 +128,6 @@ let clearData = () => {
   localStorage.setItem("userData", "");
   logout();
 };
-// TODO the remain problem is make profile img change when login or register without reload page
 const username = ref(null);
 const userProfile = ref(null);
 const userData = localStorage.getItem("userData");

@@ -84,6 +84,11 @@
           </div>
         </div>
       </div>
+      <div v-if="isloading" class="handle loading">Loading...</div>
+      <div v-if="hasError" class="handle bg-danger error">
+        <p>OOPs, Error on Fetching data...</p>
+        <p>please reload page</p>
+      </div>
     </div>
   </div>
 </template>
@@ -92,22 +97,36 @@
 import navBar from "@/components/navBar.vue";
 import { ref, onMounted } from "vue";
 import addPost from "@/components/addPost.vue";
-let url = ref({
-  posts: "https://tarmeezacademy.com/api/v1/posts?limit=15",
-});
-
 let posts = ref([]);
-const fetchData = async () => {
+let page = ref(1);
+let lastPage = ref(0);
+let isloading = ref(false);
+let hasError = ref(false);
+const fetchData = async (p = 1) => {
   try {
-    let res = await fetch(url.value.posts);
+    isloading.value = true;
+    let res = await fetch(
+      `https://tarmeezacademy.com/api/v1/posts?limit=20&page=${p}`
+    );
     let data = await res.json();
-    posts.value = data.data;
-    // console.log(posts.value);
+    posts.value.push(...data.data);
+    isloading.value = false;
+    hasError.value = false;
+    console.log(data.meta);
+    lastPage.value = data.meta.last_page;
   } catch (error) {
+    hasError.value = true;
     console.error("fetching error : " + error);
   }
 };
 onMounted(fetchData);
+window.addEventListener("scroll", () => {
+  let isEnd = window.scrollY + window.innerHeight >= document.body.scrollHeight;
+  if (isEnd && page.value <= lastPage.value) {
+    console.log("the end of page");
+    fetchData(++page.value);
+  }
+});
 </script>
 
 <style lang="scss">
@@ -156,6 +175,20 @@ onMounted(fetchData);
         font-weight: 900;
         color: #000;
       }
+    }
+  }
+  .handle {
+    text-align: center;
+    padding: 15px;
+    background: #0080ff;
+    border-radius: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+    line-height: 1;
+    .p {
+      margin: 0;
     }
   }
 }
