@@ -1,8 +1,12 @@
 <template>
   <navBar></navBar>
-  <div class="container">
-    <div class="posts m-auto col-9">
+  <div class="container pb-3">
+    <div
+      class="posts m-auto col-9"
+      :style="fromPost ? 'padding-bottom: 50px;' : ''"
+    >
       <add-post v-if="fromHome"></add-post>
+      <!-- display Post(s) -->
       <div
         v-for="(post, i) in posts"
         :key="post.id"
@@ -125,7 +129,7 @@
                 <div class="label">Comment(s)</div>
               </div>
             </div>
-            <div class="share-post d-flex gap-2">
+            <div class="share-post d-flex">
               <div class="icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -145,18 +149,88 @@
           </footer>
         </div>
       </div>
+      <!-- show comments section -->
+      <displayCommntsVue
+        v-if="fromPost"
+        :comments="comments"
+      ></displayCommntsVue>
     </div>
   </div>
+  <!-- add comment section -->
+  <form
+    v-if="isLoggedIn && fromPost"
+    @submit.prevent="sendComment"
+    class="container col-sm-12 col-md-9 comment-section d-flex position-fixed"
+  >
+    <div class="comment-input">
+      <div class="user-info">
+        <router-link to="/profile" class="img rounded-circle">
+          <img
+            v-if="
+              '{}' !== JSON.stringify(myAccount.user.profile_image) &&
+              JSON.stringify(myAccount.user.profile_image) !== 'null'
+            "
+            :src="myAccount.user.profile_image"
+            width="40px"
+            height="40px"
+            class="rounded-circle"
+            alt=""
+          />
+          <img
+            v-else
+            src="../assets/profileImg/userMan.png"
+            width="40px"
+            height="40px"
+            class="rounded-circle"
+            alt=""
+          />
+        </router-link>
+      </div>
+      <textarea
+        type="text"
+        ref="inputComment"
+        v-model="commentBody"
+        @input="chaneHeight"
+        :placeholder="'Comment as ' + myAccount.user.name"
+      ></textarea>
+      <label
+        for="sendComment"
+        class="send-comment"
+        :style="commentBody == '' ? 'background: #8ebdec; cursor:auto' : ''"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-send-fill send-icon"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"
+          />
+        </svg>
+        <input type="submit" id="sendComment" value="" />
+      </label>
+    </div>
+  </form>
 </template>
 
 <script setup>
 import navBar from "@/components/navBar.vue";
-import AddPost from "./addPost.vue";
 import router from "@/router";
+import AddPost from "./addPost.vue";
+import displayCommntsVue from "@/components/displayComments.vue";
 import { userDataPublic } from "@/store/users";
 import { ref, defineProps } from "vue";
+import { storeToRefs } from "pinia";
+import axios from "axios";
 const store = userDataPublic();
-defineProps({
+let inputComment = ref(null);
+let commentBody = ref("");
+let { myAccount } = storeToRefs(store);
+let { isLoggedIn } = storeToRefs(store);
+let props = defineProps({
   posts: {
     type: Array,
     required: true,
@@ -167,8 +241,11 @@ defineProps({
   fromPost: {
     type: Boolean,
   },
+  comments: {
+    type: Array,
+  },
 });
-
+let commentsData = ref(props.comments);
 let toggleLike = (idx) => {
   document
     .querySelectorAll(".footer .like-post .fill")
@@ -184,9 +261,75 @@ let toggleLike = (idx) => {
 };
 const goToPostDetail = (post) => {
   router.push(`/posts/${post.id}`);
-  let arr = ref([]);
-  arr.value.push(post);
-  store.addUsers(arr.value);
+};
+const chaneHeight = () => {
+  if (inputComment.value.value == "") inputComment.value.style.height = "60px";
+  if (inputComment.value.scrollHeight <= 200)
+    inputComment.value.style.height = inputComment.value.scrollHeight + "px";
+};
+
+// const getComments = async () => {
+//   if (props.fromPost) {
+//     const id = ref(props.posts[0].id);
+//     const myHeaders = {
+//       Authorization: `Bearer ${myAccount.value.token}`,
+//     };
+//     try {
+//       let res = await axios.get(
+//         `https://tarmeezacademy.com/api/v1/posts/${id.value}/comments`,
+//         {
+//           headers: myHeaders,
+//         }
+//       );
+//       commentsData.value = await res.data.data;
+//       console.log(commentsData.value);
+//       try {
+//         for (let i = 0; i < commentsData.value.length; i++) {
+//           let id = commentsData.value[i].author_id;
+//           let res = await axios.get(
+//             `https://tarmeezacademy.com/api/v1/users/${id}`
+//           );
+//           let ele = await res.data.data;
+//           console.log(ele);
+//           commentsData.value[i].author = ele;
+//         }
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   }
+// };
+// onMounted(() => {
+//   getComments();
+// });
+
+const sendComment = () => {
+  const id = ref(props.posts[0].id);
+  console.log(id.value);
+  const myHeaders = {
+    Authorization: `Bearer ${myAccount.value.token}`,
+  };
+  let body = {
+    body: commentBody.value,
+  };
+  axios
+    .post(
+      `https://tarmeezacademy.com/api/v1/posts/${id.value}/comments`,
+      body,
+      {
+        headers: myHeaders,
+      }
+    )
+    .then((res) => {
+      console.log(res.data);
+      commentsData.value.push(res.data.data);
+      commentBody.value = "";
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 </script>
 
@@ -229,10 +372,6 @@ const goToPostDetail = (post) => {
           white-space: normal !important;
         }
       }
-      .card-img {
-        // max-height: 300px;
-        // overflow: hidden;
-      }
     }
     footer {
       color: #0080ff;
@@ -242,6 +381,7 @@ const goToPostDetail = (post) => {
       & > div {
         cursor: pointer;
         align-items: center;
+        gap: 5px;
       }
       .comment-post {
         padding: 0 30px 0;
@@ -264,6 +404,100 @@ const goToPostDetail = (post) => {
       margin: 0;
     }
   }
+  .comments-view {
+    .comment {
+      position: relative;
+      background: #fff;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      padding: 15px;
+      .img {
+        position: absolute;
+        left: -50px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .content {
+        .name {
+          font-weight: bold;
+          font-size: 18px;
+        }
+        .username {
+          font-size: 14px;
+        }
+        hr {
+          margin: 5px;
+        }
+        .text {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+.comment-section {
+  background-color: #f0f2f5;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  padding-bottom: 5px;
+  .comment-input {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    textarea {
+      box-shadow: 0 0px 5px 0px rgba(0, 0, 0, 0.3);
+      position: relative;
+      padding: 15px 45px 10px 60px;
+      width: 100%;
+      height: 60px;
+      border-radius: 5px;
+      resize: none;
+      &:focus {
+        outline: 1px solid #2790fa9c;
+      }
+    }
+  }
+  .user-info,
+  .send-comment {
+    position: absolute;
+    z-index: 2;
+  }
+  .user-info {
+    left: 20px;
+  }
+  .send-comment {
+    cursor: pointer;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0080ff; // disabled => #8ebdec
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    .send-icon {
+      color: #fff;
+    }
+  }
+}
+@media (max-width: 766px) {
+  .comment-post {
+    gap: 5px;
+    padding: 0 30px !important;
+    // border: none !important;
+  }
+  .like,
+  .comment .label,
+  .share {
+    display: none;
+  }
 }
 @media (max-width: 991px) {
   .container {
@@ -274,16 +508,6 @@ const goToPostDetail = (post) => {
   }
   .posts .post footer {
     font-size: 12px;
-  }
-  .comment-post {
-    gap: 5px;
-    padding: 0 30px !important;
-    // border: none !important;
-  }
-  .like,
-  .comment .label,
-  .share {
-    display: none;
   }
 }
 @media (min-width: 992px) {

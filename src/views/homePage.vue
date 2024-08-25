@@ -167,7 +167,7 @@ const fetchData = async (p = 1) => {
     posts.value.push(...data.data);
     isloading.value = false;
     hasError.value = false;
-    console.log(data.meta);
+    // console.log(data.meta);
     lastPage.value = data.meta.last_page;
   } catch (error) {
     hasError.value = true;
@@ -178,7 +178,7 @@ const handleScroll = () => {
   let isEnd =
     window.scrollY + window.innerHeight >= document.body.scrollHeight - 200;
   if (isEnd && page.value <= lastPage.value) {
-    console.log("the end of page");
+    // console.log("the end of page");
     fetchData(++page.value);
   }
 };

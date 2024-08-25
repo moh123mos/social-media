@@ -4,7 +4,7 @@
     class="add-post add-post bg-light rounded mb-3 shadow-sm"
   >
     <div
-      class="input-preview input-preview d-flex align-items-center justify-content-evenly pt-3"
+      class="input-preview d-flex align-items-center justify-content-evenly pt-3"
     >
       <router-link to="/profile" class="img rounded-circle">
         <img
@@ -29,6 +29,8 @@
       </router-link>
       <div class="input-post">
         <textarea
+          @input="chaneHeight"
+          ref="textArea"
           type="text"
           class="body-input w-100"
           :placeholder="'what`s on your mind, ' + username + ' ?'"
@@ -76,13 +78,14 @@ import { ref } from "vue";
 import axios from "axios";
 const store = userDataPublic();
 const { isLoggedIn } = storeToRefs(store);
-const username = ref(null);
-const userProfile = ref(null);
-const userData = localStorage.getItem("userData");
 let bodyInput = ref("");
 let sendPostBtn = ref(null);
 let imageInput = ref(null);
 let invalidBody = ref(null);
+let textArea = ref(null);
+const username = ref(null);
+const userProfile = ref(null);
+const userData = localStorage.getItem("userData");
 if (userData) {
   username.value = JSON.parse(localStorage.getItem("userData")).user.name;
   userProfile.value = JSON.parse(
@@ -119,6 +122,12 @@ const createPost = () => {
       invalidBody.value.innerHTML = err.response.data.message;
     });
 };
+const chaneHeight = () => {
+  if (textArea.value.value == "") textArea.value.style.height = "60px";
+  if (textArea.value.scrollHeight <= 300)
+    textArea.value.style.height = textArea.value.scrollHeight + "px";
+  console.log(textArea.value.scrollHeight);
+};
 </script>
 
 <style lang="scss">
@@ -139,6 +148,8 @@ $main-color: #0080ff;
       background: #e4e6e9;
       padding: 15px;
       border-radius: 10px;
+      resize: none;
+      height: 60px;
       &:focus {
         outline: 3px solid $main-color;
       }
@@ -146,15 +157,15 @@ $main-color: #0080ff;
         width: 5px;
       }
       &::-webkit-scrollbar-track {
-        background-color: #e7e9eb;
+        background-color: transparent;
         border-radius: 10px;
       }
       &::-webkit-scrollbar-thumb {
-        background-color: #53636f;
+        background-color: #6c7e8b;
         border-radius: 10px;
       }
       &::-webkit-scrollbar-thumb:hover {
-        background-color: rgb(136, 8, 8);
+        background-color: #0080ff;
       }
     }
   }
