@@ -152,8 +152,8 @@ let invalidUsername = ref(null);
 let invalidPassword = ref(null);
 let invalidEmail = ref(null);
 const body = ref({
-  username: "moh289mos",
-  password: "moh289mos",
+  username: "",
+  password: "",
 });
 
 const store = userDataPublic();
