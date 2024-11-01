@@ -242,10 +242,10 @@ let invalidUsername = ref(null);
 let invalidPassword = ref(null);
 const body = ref({
   lastName: "",
-  name: `Mohamed`,
-  email: "Mohamed9@gil.cm",
-  username: "molioa1",
-  password: "123456",
+  name: ``,
+  email: "",
+  username: "",
+  password: "",
   profile_image: "",
 });
 let imgFile = ref(null);
