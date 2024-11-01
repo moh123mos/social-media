@@ -30,8 +30,14 @@ ul,
   border: 0;
   list-style: none;
 }
+input {
+  &:focus {
+    outline: 1px solid #0080ff;
+  }
+}
 body {
   background-color: #f0f2f5 !important;
+  scroll-behavior: smooth;
 }
 .container {
   margin-top: 100px;

@@ -3,9 +3,9 @@
     class="navbar position-fixed navbar-expand-lg bg-body-tertiary m-auto col-12 rounded shadow-sm mb-4"
   >
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">
+      <router-link class="navbar-brand" to="/">
         <span class="logo">f</span>
-      </a>
+      </router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -43,9 +43,9 @@
               <span class="home mt-1 mx-1">Home</span></router-link
             >
           </li>
-          <li class="nav-item">
-            <router-link
-              to="/profile"
+          <li class="nav-item" v-if="isLoggedIn">
+            <a
+              @click="goToProfileDetail(myAccount.user.id)"
               class="nav-link active d-flex align-items-center"
               aria-current="page"
               href="#"
@@ -66,8 +66,8 @@
                   />
                 </svg>
               </div>
-              <span class="home mt-1 mx-1">Profile</span></router-link
-            >
+              <span class="home mt-1 mx-1">Profile</span>
+            </a>
           </li>
         </ul>
         <ul class="btns mb-0">
@@ -94,10 +94,11 @@
               />
             </router-link>
             <li class="">
-              <a
+              <router-link
+                to="/"
                 class="btn btn-outline-danger btn-sm logout-btn"
                 @click="clearData"
-                >Logout</a
+                >Logout</router-link
               >
             </li>
           </div>
@@ -119,10 +120,11 @@
 import { ref } from "vue";
 import { userDataPublic } from "@/store/users";
 import { storeToRefs } from "pinia";
-
+import router from "@/router";
 const store = userDataPublic();
 
 const { isLoggedIn } = storeToRefs(store);
+const { myAccount } = storeToRefs(store);
 
 const logout = store.logout;
 let clearData = () => {
@@ -136,6 +138,9 @@ if (userData) {
   username.value = JSON.parse(userData).user.name;
   userProfile.value = JSON.parse(userData).user.profile_image;
 }
+const goToProfileDetail = (id) => {
+  router.push(`/profile/${id}`);
+};
 </script>
 <style lang="scss">
 $main-color: #0080ff;

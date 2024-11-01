@@ -7,16 +7,77 @@
       ref="Container"
     >
       <!--* display profile *-->
-      <DisplayProfile
-        :userDetails="userDetails"
-        v-if="fromUserProfile"
-      ></DisplayProfile>
+      <div class="profile-cont mb-5 mt-5">
+        <div class="card card-profile w-100 m-auto p-3">
+          <div class="d-flex align-items-center">
+            <div class="user-img">
+              <img
+                v-if="'{}' !== JSON.stringify(user.profile_image)"
+                :src="user.profile_image"
+                width="100%"
+                class="rounded"
+                alt=""
+              />
+              <img
+                v-else
+                src="../assets/profileImg/userMan.png"
+                width="100%"
+                class="rounded"
+                alt=""
+              />
+            </div>
+            <div
+              class="ms-3 w-100"
+              style="
+                height: 270px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-evenly;
+              "
+            >
+              <div class="">
+                <h4 class="mb-0 mt-0">{{ user.name }}</h4>
+                <p>{{ user.username }}</p>
+              </div>
+
+              <div
+                class="statistics p-2 mt-2 d-flex justify-content-evenly rounded text-white stats text-center"
+              >
+                <div class="d-flex flex-column">
+                  <span class="title">Posts</span>
+                  <span class="number">{{ user.posts_count }}</span>
+                </div>
+
+                <div class="d-flex flex-column ms-2">
+                  <span class="title">Comments</span>
+                  <span class="number">{{ user.comments_count }}</span>
+                </div>
+              </div>
+
+              <div class="button mt-2 d-flex flex-row align-items-center">
+                <a
+                  href="https://66bf67af0e229946a5c88779--roaring-churros-8adbed.netlify.app/"
+                  class="btn btn-sm btn-outline-primary w-100"
+                >
+                  Chat
+                </a>
+                <a
+                  href="https://github.com/moh123mos"
+                  class="btn btn-sm btn-primary w-100 ms-2"
+                >
+                  Follow
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <!--* / display profile / *-->
 
       <!--* add posts *-->
-      <!-- <add-post v-if="fromHome"></add-post> -->
+      <!-- <add-post v-if="user.id == myAccount.user.id"></add-post> -->
       <div
-        v-if="isLoggedIn && fromHome"
+        v-if="isLoggedIn && user.id == myAccount.user.id"
         class="add-post add-post bg-light rounded mb-3 shadow-sm"
       >
         <div
@@ -48,7 +109,7 @@
           </a>
           <div class="input-post">
             <textarea
-              @input="chaneHeightCreatePost"
+              @input="chaneHeight"
               ref="textArea"
               type="text"
               class="body-input w-100"
@@ -97,30 +158,60 @@
 
       <!--* display Post(s) *-->
       <div
-        v-for="(post, i) in postsData"
+        v-for="(post, i) in posts"
         :key="post.id"
         class="post card shadow-sm mb-4"
       >
-        <div class="card-header d-flex align-items-center gap-1">
-          <div class="user-img">
-            <img
-              v-if="'{}' !== JSON.stringify(post.author.profile_image)"
-              :src="post.author.profile_image"
-              width="40px"
-              height="40px"
-              class="rounded-circle"
-              alt=""
-              @click="showProfileImg(post.author.id)"
-            />
-            <img
-              v-else
-              src="../assets/profileImg/userMan.png"
-              width="40px"
-              height="40px"
-              class="rounded-circle"
-              alt=""
-              @click="showProfileImg(post.author.id)"
-            />
+        <div
+          class="card-header d-flex align-items-center justify-content-between gap-1"
+        >
+          <div class="d-flex">
+            <div class="user-img">
+              <img
+                v-if="'{}' !== JSON.stringify(post.author.profile_image)"
+                :src="post.author.profile_image"
+                width="40px"
+                height="40px"
+                class="rounded-circle"
+                alt=""
+                @click="showProfileImg(post.author.id)"
+              />
+              <img
+                v-else
+                src="../assets/profileImg/userMan.png"
+                width="40px"
+                height="40px"
+                class="rounded-circle"
+                alt=""
+                @click="showProfileImg(post.author.id)"
+              />
+            </div>
+            <div class="user-post ms-2">
+              <div class="name">{{ post.author.name }}</div>
+              <div class="date-post">
+                <div
+                  @click="goToProfileDetail(post.author.id)"
+                  class="user-name d-inline-block me-2"
+                >
+                  {{ post.author.username }}
+                </div>
+                <span class="date me-2">{{ post.created_at }}</span>
+                <span class="icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-people-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
           </div>
           <div
             class="overlay d-none"
@@ -146,48 +237,188 @@
               alt=""
             />
           </div>
-          <div class="user-post">
-            <div class="name">{{ post.author.name }}</div>
-            <div class="date-post">
-              <div
-                @click="goToProfileDetail(post.author.id)"
-                class="user-name d-inline-block me-2"
-              >
-                {{ post.author.username }}
-              </div>
-              <span class="date me-2">{{ post.created_at }}</span>
-              <span class="icon">
+          <div v-if="user.id == myAccount.user.id" class="edition d-flex">
+            <div
+              class="btn btn-outline-primary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#editPost"
+              @click="changeId(post.id, i, post.body, post.title)"
+            >
+              <span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
                   height="16"
                   fill="currentColor"
-                  class="bi bi-people-fill"
+                  class="bi bi-pencil-square"
                   viewBox="0 0 16 16"
                 >
                   <path
-                    d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"
+                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
                   />
                 </svg>
               </span>
+              <span class="ms-1 d-none d-md-inline">Edit</span>
+            </div>
+            <div
+              class="btn btn-outline-danger btn-sm ms-2"
+              data-bs-toggle="modal"
+              data-bs-target="#removePost"
+              @click="changeId(post.id, i)"
+            >
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-trash3-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"
+                  />
+                </svg>
+              </span>
+              <span class="ms-1 d-none d-md-inline">Remove</span>
+            </div>
+            <!-- Delete modal -->
+            <div
+              class="modal fade"
+              id="removePost"
+              tabindex="-1"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="exampleModalLabel">
+                      Warning!
+                    </h5>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="modal-body">
+                    Are You Sure You Want To Delete This Post ?
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button
+                      @click="deletePost()"
+                      type="button"
+                      class="btn btn-danger"
+                      data-bs-dismiss="modal"
+                    >
+                      Delete Post
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Edit Modal -->
+            <div
+              class="modal fade"
+              id="editPost"
+              tabindex="-1"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title text-primary" id="exampleModalLabel">
+                      Edit Body Of Post !
+                    </h5>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="modal-body">
+                    <div
+                      class="title"
+                      v-if="
+                        DataForPost.title != '' && DataForPost.title != null
+                      "
+                    >
+                      <label class="fw-bold text-primary" for="title"
+                        >Title of Post</label
+                      >
+                      <input
+                        v-if="
+                          DataForPost.title != '' && DataForPost.title != null
+                        "
+                        class="w-100 p-2 m-1 bg-light rounded"
+                        type="text"
+                        v-model="DataForPost.title"
+                        ref="newTitle"
+                      />
+                    </div>
+                    <div class="body">
+                      <label class="fw-bold text-primary" for="body"
+                        >Body Of Post</label
+                      >
+                      <input
+                        id="body"
+                        class="w-100 p-2 m-1 bg-light rounded"
+                        type="text"
+                        v-model="DataForPost.body"
+                        ref="newBody"
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button
+                      @click="editPost"
+                      type="button"
+                      class="btn btn-primary"
+                      data-bs-dismiss="modal"
+                    >
+                      Done!
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" @click="goToPostDetail(post)">
           <div class="card-title fw-bold">
             {{ post.title }}
           </div>
           <div
             class="card-text mb-2"
             :style="fromPost ? 'white-space: normal;' : 'white-space: nowarp;'"
-            @click="goToPostDetail(post)"
           >
             {{ post.body }}
           </div>
           <div
             class="card-img mb-3 h-100"
             :style="fromPost ? '' : 'overflow: hidden; max-height: 300px'"
-            @click="goToPostDetail(post)"
           >
             <img :src="post.image" class="rounded w-100" alt="" />
           </div>
@@ -224,10 +455,7 @@
               </div>
               <div class="like">Like</div>
             </div>
-            <div
-              class="comment-post d-flex gap-2"
-              @click="goToPostDetail(post)"
-            >
+            <div class="comment-post d-flex gap-2">
               <div class="icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -268,83 +496,8 @@
         </div>
       </div>
       <!--*/ display Post(s) /*-->
-
-      <!--* show comments section *-->
-      <displayCommntsVue
-        v-if="fromPost"
-        :comments="commentsData"
-      ></displayCommntsVue>
-      <!--*/ show comments section */-->
     </div>
   </div>
-  <!--* add comment section *-->
-  <form
-    v-if="isLoggedIn && fromPost"
-    @submit.prevent="sendComment"
-    class="container col-sm-12 col-md-9 comment-section d-flex position-fixed"
-  >
-    <div class="comment-input">
-      <div class="user-info">
-        <router-link to="/profile" class="img rounded-circle">
-          <img
-            v-if="
-              '{}' !== JSON.stringify(myAccount.user.profile_image) &&
-              JSON.stringify(myAccount.user.profile_image) !== 'null'
-            "
-            :src="myAccount.user.profile_image"
-            width="40px"
-            height="40px"
-            class="rounded-circle"
-            alt=""
-          />
-          <img
-            v-else
-            src="../assets/profileImg/userMan.png"
-            width="40px"
-            height="40px"
-            class="rounded-circle"
-            alt=""
-          />
-        </router-link>
-      </div>
-      <textarea
-        type="text"
-        ref="inputComment"
-        v-model="commentBody"
-        @input="chaneHeight"
-        :placeholder="'Comment as ' + myAccount.user.name"
-      ></textarea>
-      <label
-        for="sendComment"
-        class="send-comment"
-        tabindex="0"
-        :class="{ focused: isFocused }"
-        :style="commentBody == '' ? 'background: #8ebdec; cursor:auto' : ''"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="currentColor"
-          class="bi bi-send-fill send-icon"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"
-          />
-        </svg>
-        <input
-          type="submit"
-          @focus="handleFocus"
-          @blur="handleBlur"
-          id="sendComment"
-          value=""
-        />
-      </label>
-    </div>
-  </form>
-  <!--*/ add comment section */-->
-
   <!-- * btn to up * -->
   <div
     class="arrow-up position-fixed"
@@ -366,54 +519,44 @@
   </div>
   <!--*/ btn to up */ -->
 </template>
-
 <script setup>
-import navBar from "@/components/navBar.vue";
-import router from "@/router";
-// import AddPost from "./addPost.vue";
-import displayCommntsVue from "@/components/displayComments.vue";
-import { userDataPublic } from "@/store/users";
-import { ref, defineProps, onMounted, computed } from "vue";
-import { storeToRefs } from "pinia";
 import axios from "axios";
 import { useRoute } from "vue-router";
-import DisplayProfile from "./displayProfile.vue";
+import navBar from "@/components/navBar.vue";
+import router from "@/router";
+// import AddPost from "../components/addPost.vue";
+import { ref, computed, onMounted } from "vue";
+import { userDataPublic } from "@/store/users";
+import { storeToRefs } from "pinia";
 const store = userDataPublic();
-let inputComment = ref(null);
+let { myAccount } = storeToRefs(store);
+const id = useRoute().params.id;
+let user = ref({});
+let posts = ref([]);
+let DataForPost = ref({
+  id: 0,
+  i: 0,
+  body: "",
+  title: "",
+});
+const requests = [
+  axios.get(`https://tarmeezacademy.com/api/v1/users/${id}`),
+  axios.get(`https://tarmeezacademy.com/api/v1/users/${id}/posts`),
+];
+const getUserProfile = () => {
+  axios.all(requests).then(
+    axios.spread((res1, res2) => {
+      user.value = res1.data.data;
+      posts.value = res2.data.data;
+      posts.value.reverse();
+      // console.log(user.value);
+    })
+  );
+};
+
 let Container = ref(null);
 let overlay = ref(null);
-let commentBody = ref("");
-let { myAccount } = storeToRefs(store);
-let { isLoggedIn } = storeToRefs(store);
-let props = defineProps({
-  posts: {
-    type: Array,
-    required: true,
-  },
-  fromHome: {
-    type: Boolean,
-  },
-  fromPost: {
-    type: Boolean,
-  },
-  fromUserProfile: {
-    type: Boolean,
-  },
-  comments: {
-    type: Array,
-  },
-  userDetails: {
-    type: Array,
-  },
-  isloading: {
-    type: Boolean,
-  },
-});
-let postsData = ref([]);
-postsData = ref(props.posts);
-console.log(postsData.value);
-// console.log(props.userDetails);
-let commentsData = ref(props.comments);
+// * for scroll to top
 const scrollY = ref(window.scrollY);
 window.addEventListener("scroll", () => {
   scrollY.value = window.scrollY;
@@ -421,6 +564,11 @@ window.addEventListener("scroll", () => {
 const shouldAppear = computed(() => {
   return scrollY.value >= 500;
 });
+const scrollToTop = () => {
+  window.scrollTo(document.body.scrollTop, 0);
+};
+// *End for scroll to top
+
 let toggleLike = (idx) => {
   document
     .querySelectorAll(".footer .like-post .fill")
@@ -437,51 +585,7 @@ const goToPostDetail = (post) => {
 const goToProfileDetail = (id) => {
   router.push(`/profile/${id}`);
 };
-const chaneHeight = () => {
-  if (inputComment.value.value == "") inputComment.value.style.height = "60px";
-  if (inputComment.value.scrollHeight <= 200)
-    inputComment.value.style.height = inputComment.value.scrollHeight + "px";
-};
 
-const sendComment = () => {
-  const id = ref(props.posts[0].id);
-  const myHeaders = {
-    Authorization: `Bearer ${myAccount.value.token}`,
-  };
-  let body = {
-    body: commentBody.value,
-  };
-  commentBody.value = "";
-  axios
-    .post(
-      `https://tarmeezacademy.com/api/v1/posts/${id.value}/comments`,
-      body,
-      {
-        headers: myHeaders,
-      }
-    )
-    .then((res) => {
-      commentsData.value.push(res.data.data);
-      scrollToBottom();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
-const scrollToBottom = () => {
-  window.scrollTo(0, document.body.scrollHeight);
-};
-const scrollToTop = () => {
-  window.scrollTo(document.body.scrollTop, 0);
-};
-const getComment = () => {
-  let id = useRoute().params.id;
-  axios.get(`https://tarmeezacademy.com/api/v1/posts/${id}`).then((res) => {
-    console.log(res.data.data);
-    commentsData.value = res.data.data.comments;
-  });
-};
 const showProfileImg = (id, show = true) => {
   if (show) {
     document.querySelector(".overlay-" + id).classList.remove("d-none");
@@ -491,10 +595,64 @@ const showProfileImg = (id, show = true) => {
     document.querySelector(".img-" + id).classList.add("d-none");
   }
 };
+const deletePost = () => {
+  const myHeaders = {
+    Accept: "application/json",
+    Authorization: `Bearer ${myAccount.value.token}`,
+  };
+  axios
+    .delete(`https://tarmeezacademy.com/api/v1/posts/${DataForPost.value.id}`, {
+      headers: myHeaders,
+    })
+    .then((res) => {
+      console.log(res);
+      posts.value.splice(DataForPost.value.i, 1);
+      --user.value.posts_count;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+const editPost = () => {
+  let body = {
+    body: DataForPost.value.body,
+    title: DataForPost.value.title,
+  };
+  const myHeaders = {
+    Accept: "application/json",
+    Authorization: `Bearer ${myAccount.value.token}`,
+  };
+  axios
+    .put(
+      `https://tarmeezacademy.com/api/v1/posts/${DataForPost.value.id}`,
+      body,
+      {
+        headers: myHeaders,
+      }
+    )
+    .then((res) => {
+      console.log(res);
+      // posts.value.splice(DataForPost.value.i, 1);
+      posts.value[DataForPost.value.i] = res.data.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+const changeId = (id, i, body = "", title = "") => {
+  console.log(id);
+  console.log(i);
+  DataForPost.value.id = id;
+  DataForPost.value.i = i;
+  DataForPost.value.body = body;
+  DataForPost.value.title = title;
+};
+// Hooks
 onMounted(() => {
-  if (props.fromPost) getComment();
+  getUserProfile();
 });
 /// NOTE - this for creation post */
+const { isLoggedIn } = storeToRefs(store);
 let bodyInput = ref("");
 let sendPostBtn = ref(null);
 let imageInput = ref(null);
@@ -530,9 +688,9 @@ const createPost = () => {
     })
     .then((res) => {
       console.log(res.data.data);
-      postsData.value.unshift(res.data.data);
+      posts.value.unshift(res.data.data);
       bodyInput.value = "";
-      // ++user.value.posts_count;
+      ++user.value.posts_count;
       imageInput.value = null;
     })
     .catch((err) => {
@@ -540,14 +698,14 @@ const createPost = () => {
       invalidBody.value.innerHTML = err.response.data.message;
     });
 };
-const chaneHeightCreatePost = () => {
+const chaneHeight = () => {
   if (textArea.value.value == "") textArea.value.style.height = "60px";
   if (textArea.value.scrollHeight <= 200)
     textArea.value.style.height = textArea.value.scrollHeight + "px";
+  // console.log(textArea.value.scrollHeight);
 };
 </script>
-
-<style lang="scss">
+<style lang="scss" scoped>
 .overlay {
   position: fixed;
   left: 0;
@@ -585,6 +743,9 @@ const chaneHeightCreatePost = () => {
           }
         }
       }
+      .user-img {
+        cursor: pointer;
+      }
       .user-img-preview {
         position: fixed;
         z-index: 6;
@@ -602,6 +763,7 @@ const chaneHeightCreatePost = () => {
     }
     .card-body {
       .card-text {
+        cursor: pointer;
         color: gray;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -674,72 +836,32 @@ const chaneHeightCreatePost = () => {
   }
 }
 
-.comment-section {
-  background-color: #f0f2f5;
-  bottom: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  align-items: center;
-  padding-bottom: 5px;
-  .comment-input {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    textarea {
-      box-shadow: 0 0px 5px 0px rgba(0, 0, 0, 0.3);
-      position: relative;
-      padding: 15px 45px 10px 60px;
-      width: 100%;
-      height: 60px;
-      border-radius: 5px;
-      resize: none;
-      &:focus {
-        outline: 1px solid #2790fa9c;
-      }
-    }
-  }
-  .user-info,
-  .send-comment {
-    position: absolute;
-    z-index: 2;
-  }
-  .user-info {
-    left: 20px;
-  }
-  .send-comment {
-    cursor: pointer;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #0080ff; // disabled => #8ebdec
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-    transition: 0.2s;
-    &:focus {
-      // background-color: red;
-      outline: 1px solid #908f8f;
-      background-color: #fff;
-      .send-icon {
-        color: #0080ff;
-      }
-    }
-    .send-icon {
-      color: #fff;
-    }
-  }
-}
 .arrow-up {
   bottom: 15px;
   right: 50px;
-  color: #0080ff;
+  color: hsl(210, 100%, 50%);
   cursor: pointer;
 }
+
+.card-profile {
+  width: 400px;
+  border: none;
+  border-radius: 10px;
+  background-color: #fff;
+  .stats {
+    background: #f2f5f8 !important;
+    color: #000 !important;
+    .title {
+      font-weight: bold;
+      font-size: 16px;
+      color: #a1aab9;
+    }
+    .number {
+      font-weight: 500;
+    }
+  }
+}
+
 @media (max-width: 766px) {
   .comment-post {
     gap: 5px;
@@ -751,11 +873,13 @@ const chaneHeightCreatePost = () => {
   .share {
     display: none;
   }
-  .comment-section .comment-input textarea {
-    font-size: 12px;
-  }
-  .comments-view .text {
-    font-size: 14px !important;
+}
+@media (min-width: 766px) {
+  .user-img-preview {
+    img {
+      height: 400px !important;
+      width: 400px !important;
+    }
   }
 }
 @media (max-width: 991px) {
@@ -767,10 +891,6 @@ const chaneHeightCreatePost = () => {
   }
   .posts .post footer {
     font-size: 12px;
-  }
-  .arrow-up {
-    bottom: 75px;
-    right: 10px;
   }
 }
 @media (min-width: 992px) {

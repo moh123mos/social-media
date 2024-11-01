@@ -6,7 +6,10 @@
     <div
       class="input-preview d-flex align-items-center justify-content-evenly pt-3"
     >
-      <router-link to="/profile" class="img rounded-circle">
+      <a
+        @click="goToProfileDetail(myAccount.user.id)"
+        class="img rounded-circle"
+      >
         <img
           v-if="
             '{}' !== JSON.stringify(userProfile) &&
@@ -26,7 +29,7 @@
           class="rounded-circle"
           alt=""
         />
-      </router-link>
+      </a>
       <div class="input-post">
         <textarea
           @input="chaneHeight"
@@ -76,8 +79,9 @@ import { userDataPublic } from "@/store/users";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import axios from "axios";
+import router from "@/router";
 const store = userDataPublic();
-const { isLoggedIn } = storeToRefs(store);
+const { isLoggedIn, myAccount } = storeToRefs(store);
 let bodyInput = ref("");
 let sendPostBtn = ref(null);
 let imageInput = ref(null);
@@ -105,15 +109,15 @@ const createPost = () => {
     Authorization: `Bearer ${JSON.parse(userData).token}`,
   };
   let formdata = new FormData();
-  console.log(imageInput.value == null);
+  // console.log(imageInput.value == null);
   formdata.append("body", bodyInput.value);
   if (imageInput.value != null) formdata.append("image", imageInput.value);
   axios
     .post("https://tarmeezacademy.com/api/v1/posts", formdata, {
       headers: myHeaders,
     })
-    .then((res) => {
-      console.log(res.data);
+    .then(() => {
+      // console.log(res.data);
       bodyInput.value = "";
       imageInput.value = null;
     })
@@ -124,9 +128,12 @@ const createPost = () => {
 };
 const chaneHeight = () => {
   if (textArea.value.value == "") textArea.value.style.height = "60px";
-  if (textArea.value.scrollHeight <= 300)
+  if (textArea.value.scrollHeight <= 200)
     textArea.value.style.height = textArea.value.scrollHeight + "px";
-  console.log(textArea.value.scrollHeight);
+  // console.log(textArea.value.scrollHeight);
+};
+const goToProfileDetail = (id) => {
+  router.push(`/profile/${id}`);
 };
 </script>
 
@@ -196,6 +203,11 @@ $main-color: #0080ff;
         display: none;
       }
     }
+  }
+}
+@media (max-width: 767px) {
+  .input-post .body-input {
+    font-size: 12px;
   }
 }
 </style>

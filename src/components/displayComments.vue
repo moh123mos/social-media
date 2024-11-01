@@ -2,7 +2,10 @@
   <div class="container m-auto">
     <ul class="comments-view">
       <li class="comment" v-for="comment in comments" :key="comment.id">
-        <router-link to="/profile" class="img rounded-circle">
+        <div
+          @click="goToProfileDetail(comment.author.id)"
+          class="img rounded-circle"
+        >
           <img
             v-if="
               '{}' !== JSON.stringify(comment.author.profile_image) &&
@@ -23,7 +26,7 @@
             class="rounded-circle"
             alt=""
           />
-        </router-link>
+        </div>
         <div class="content">
           <div class="user-in">
             <div class="name">{{ comment.author.name }}</div>
@@ -39,10 +42,14 @@
   </div>
 </template>
 <script setup>
+import router from "@/router";
 import { defineProps } from "vue";
 defineProps({
   comments: Array,
 });
+const goToProfileDetail = (id) => {
+  router.push(`/profile/${id}`);
+};
 </script>
 
 <style lang="scss"></style>

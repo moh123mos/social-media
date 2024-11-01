@@ -19,7 +19,6 @@ let comments = ref([]);
 const getPost = () => {
   let id = useRoute().params.id;
   axios.get(`https://tarmeezacademy.com/api/v1/posts/${id}`).then((res) => {
-    console.log(res.data.data);
     postDatails.value.push(res.data.data);
     comments.value = res.data.data.comments;
     localStorage.setItem("cur_post", JSON.stringify(postDatails.value));
@@ -27,18 +26,4 @@ const getPost = () => {
   });
 };
 onMounted(getPost);
-// console.log(users.value);
-// let toggleLike = (idx) => {
-//   document
-//     .querySelectorAll(".footer .like-post .fill")
-//     .item(idx)
-//     .classList.toggle("d-none");
-//   document
-//     .querySelectorAll(".footer .like-post .hand")
-//     .item(idx)
-//     .classList.toggle("d-none");
-//   console.log(document.querySelectorAll(".footer .like-post .hand").item(idx));
-//   console.log(document.querySelectorAll(".footer .like-post .fill").item(idx));
-//   console.log(idx);
-// };
 </script>

@@ -7,97 +7,74 @@
       ref="Container"
     >
       <!--* display profile *-->
-      <DisplayProfile
-        :userDetails="userDetails"
-        v-if="fromUserProfile"
-      ></DisplayProfile>
-      <!--* / display profile / *-->
-
-      <!--* add posts *-->
-      <!-- <add-post v-if="fromHome"></add-post> -->
-      <div
-        v-if="isLoggedIn && fromHome"
-        class="add-post add-post bg-light rounded mb-3 shadow-sm"
-      >
-        <div
-          class="input-preview d-flex align-items-center justify-content-evenly pt-3"
-        >
-          <a
-            @click="goToProfileDetail(myAccount.user.id)"
-            class="img rounded-circle"
-          >
-            <img
-              v-if="
-                '{}' !== JSON.stringify(userProfile) &&
-                JSON.stringify(userProfile) !== 'null'
-              "
-              :src="userProfile"
-              width="40px"
-              height="40px"
-              class="rounded-circle"
-              alt=""
-            />
-            <img
-              v-else
-              src="../assets/profileImg/userMan.png"
-              width="40px"
-              height="40px"
-              class="rounded-circle"
-              alt=""
-            />
-          </a>
-          <div class="input-post">
-            <textarea
-              @input="chaneHeightCreatePost"
-              ref="textArea"
-              type="text"
-              class="body-input w-100"
-              :placeholder="'what`s on your mind, ' + username + ' ?'"
-              v-model="bodyInput"
-            ></textarea>
-            <div class="message-invalid" ref="invalidBody"></div>
-          </div>
-        </div>
-        <div class="image-post">
-          <label for="inTag" class="image-icon">
-            <span>Add Image to Your Post</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              class="bi bi-card-image input-image-icon"
-              viewBox="0 0 16 16"
-            >
-              <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-              <path
-                d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54L1 12.5v-9a.5.5 0 0 1 .5-.5z"
+      <div class="profile-cont mb-5 mt-5 d-flex justify-content-center">
+        <div class="card p-3">
+          <div class="d-flex align-items-center">
+            <div class="user-img">
+              <img
+                v-if="'{}' !== JSON.stringify(userDetails.profile_image)"
+                :src="userDetails.profile_image"
+                width="100%"
+                class="rounded"
+                alt=""
               />
-            </svg>
-            <input
-              id="inTag"
-              @change="getImage"
-              type="file"
-              class="input-image"
-            />
-          </label>
-        </div>
-        <div class="send-post text-center">
-          <div
-            class="w-50 btn btn-primary mb-2 fw-bold"
-            :class="bodyInput == '' ? 'disabled' : ''"
-            ref="sendPostBtn"
-            @click="createPost"
-          >
-            Post
+              <img
+                v-else
+                src="../assets/profileImg/userMan.png"
+                width="100%"
+                class="rounded"
+                alt=""
+              />
+            </div>
+            <div
+              class="ms-3 w-100"
+              style="
+                height: 270px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-evenly;
+              "
+            >
+              <div class="">
+                <h4 class="mb-0 mt-0">{{ userDetails.name }}</h4>
+                <p>{{ userDetails.username }}</p>
+              </div>
+
+              <div
+                class="statistics p-2 mt-2 d-flex justify-content-evenly rounded text-white stats text-center"
+              >
+                <div class="d-flex flex-column">
+                  <span class="title" style="color: #a1aab9">Articles</span>
+                  <span class="number" color="#000">38</span>
+                </div>
+
+                <div class="d-flex flex-column">
+                  <span class="title">Followers</span>
+                  <span class="number">980</span>
+                </div>
+              </div>
+
+              <div class="button mt-2 d-flex flex-row align-items-center">
+                <button class="btn btn-sm btn-outline-primary w-100">
+                  Chat
+                </button>
+                <button class="btn btn-sm btn-primary w-100 ms-2">
+                  Follow
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <!--* / display profile / *-->
+
+      <!--* add posts *-->
+      <add-post v-if="fromHome"></add-post>
       <!--* / add posts / *-->
 
       <!--* display Post(s) *-->
       <div
-        v-for="(post, i) in postsData"
+        v-for="(post, i) in posts"
         :key="post.id"
         class="post card shadow-sm mb-4"
       >
@@ -173,21 +150,19 @@
             </div>
           </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" @click="goToPostDetail(post)">
           <div class="card-title fw-bold">
             {{ post.title }}
           </div>
           <div
             class="card-text mb-2"
             :style="fromPost ? 'white-space: normal;' : 'white-space: nowarp;'"
-            @click="goToPostDetail(post)"
           >
             {{ post.body }}
           </div>
           <div
             class="card-img mb-3 h-100"
             :style="fromPost ? '' : 'overflow: hidden; max-height: 300px'"
-            @click="goToPostDetail(post)"
           >
             <img :src="post.image" class="rounded w-100" alt="" />
           </div>
@@ -224,10 +199,7 @@
               </div>
               <div class="like">Like</div>
             </div>
-            <div
-              class="comment-post d-flex gap-2"
-              @click="goToPostDetail(post)"
-            >
+            <div class="comment-post d-flex gap-2">
               <div class="icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -268,83 +240,8 @@
         </div>
       </div>
       <!--*/ display Post(s) /*-->
-
-      <!--* show comments section *-->
-      <displayCommntsVue
-        v-if="fromPost"
-        :comments="commentsData"
-      ></displayCommntsVue>
-      <!--*/ show comments section */-->
     </div>
   </div>
-  <!--* add comment section *-->
-  <form
-    v-if="isLoggedIn && fromPost"
-    @submit.prevent="sendComment"
-    class="container col-sm-12 col-md-9 comment-section d-flex position-fixed"
-  >
-    <div class="comment-input">
-      <div class="user-info">
-        <router-link to="/profile" class="img rounded-circle">
-          <img
-            v-if="
-              '{}' !== JSON.stringify(myAccount.user.profile_image) &&
-              JSON.stringify(myAccount.user.profile_image) !== 'null'
-            "
-            :src="myAccount.user.profile_image"
-            width="40px"
-            height="40px"
-            class="rounded-circle"
-            alt=""
-          />
-          <img
-            v-else
-            src="../assets/profileImg/userMan.png"
-            width="40px"
-            height="40px"
-            class="rounded-circle"
-            alt=""
-          />
-        </router-link>
-      </div>
-      <textarea
-        type="text"
-        ref="inputComment"
-        v-model="commentBody"
-        @input="chaneHeight"
-        :placeholder="'Comment as ' + myAccount.user.name"
-      ></textarea>
-      <label
-        for="sendComment"
-        class="send-comment"
-        tabindex="0"
-        :class="{ focused: isFocused }"
-        :style="commentBody == '' ? 'background: #8ebdec; cursor:auto' : ''"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="currentColor"
-          class="bi bi-send-fill send-icon"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"
-          />
-        </svg>
-        <input
-          type="submit"
-          @focus="handleFocus"
-          @blur="handleBlur"
-          id="sendComment"
-          value=""
-        />
-      </label>
-    </div>
-  </form>
-  <!--*/ add comment section */-->
-
   <!-- * btn to up * -->
   <div
     class="arrow-up position-fixed"
@@ -370,50 +267,12 @@
 <script setup>
 import navBar from "@/components/navBar.vue";
 import router from "@/router";
-// import AddPost from "./addPost.vue";
-import displayCommntsVue from "@/components/displayComments.vue";
-import { userDataPublic } from "@/store/users";
-import { ref, defineProps, onMounted, computed } from "vue";
-import { storeToRefs } from "pinia";
-import axios from "axios";
-import { useRoute } from "vue-router";
-import DisplayProfile from "./displayProfile.vue";
-const store = userDataPublic();
-let inputComment = ref(null);
+import AddPost from "./addPost.vue";
+import { ref, computed } from "vue";
+
 let Container = ref(null);
 let overlay = ref(null);
-let commentBody = ref("");
-let { myAccount } = storeToRefs(store);
-let { isLoggedIn } = storeToRefs(store);
-let props = defineProps({
-  posts: {
-    type: Array,
-    required: true,
-  },
-  fromHome: {
-    type: Boolean,
-  },
-  fromPost: {
-    type: Boolean,
-  },
-  fromUserProfile: {
-    type: Boolean,
-  },
-  comments: {
-    type: Array,
-  },
-  userDetails: {
-    type: Array,
-  },
-  isloading: {
-    type: Boolean,
-  },
-});
-let postsData = ref([]);
-postsData = ref(props.posts);
-console.log(postsData.value);
-// console.log(props.userDetails);
-let commentsData = ref(props.comments);
+// * for scroll to top
 const scrollY = ref(window.scrollY);
 window.addEventListener("scroll", () => {
   scrollY.value = window.scrollY;
@@ -421,6 +280,11 @@ window.addEventListener("scroll", () => {
 const shouldAppear = computed(() => {
   return scrollY.value >= 500;
 });
+const scrollToTop = () => {
+  window.scrollTo(document.body.scrollTop, 0);
+};
+// *End for scroll to top
+
 let toggleLike = (idx) => {
   document
     .querySelectorAll(".footer .like-post .fill")
@@ -437,51 +301,7 @@ const goToPostDetail = (post) => {
 const goToProfileDetail = (id) => {
   router.push(`/profile/${id}`);
 };
-const chaneHeight = () => {
-  if (inputComment.value.value == "") inputComment.value.style.height = "60px";
-  if (inputComment.value.scrollHeight <= 200)
-    inputComment.value.style.height = inputComment.value.scrollHeight + "px";
-};
 
-const sendComment = () => {
-  const id = ref(props.posts[0].id);
-  const myHeaders = {
-    Authorization: `Bearer ${myAccount.value.token}`,
-  };
-  let body = {
-    body: commentBody.value,
-  };
-  commentBody.value = "";
-  axios
-    .post(
-      `https://tarmeezacademy.com/api/v1/posts/${id.value}/comments`,
-      body,
-      {
-        headers: myHeaders,
-      }
-    )
-    .then((res) => {
-      commentsData.value.push(res.data.data);
-      scrollToBottom();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
-const scrollToBottom = () => {
-  window.scrollTo(0, document.body.scrollHeight);
-};
-const scrollToTop = () => {
-  window.scrollTo(document.body.scrollTop, 0);
-};
-const getComment = () => {
-  let id = useRoute().params.id;
-  axios.get(`https://tarmeezacademy.com/api/v1/posts/${id}`).then((res) => {
-    console.log(res.data.data);
-    commentsData.value = res.data.data.comments;
-  });
-};
 const showProfileImg = (id, show = true) => {
   if (show) {
     document.querySelector(".overlay-" + id).classList.remove("d-none");
@@ -490,60 +310,6 @@ const showProfileImg = (id, show = true) => {
     document.querySelector(".overlay-" + id).classList.add("d-none");
     document.querySelector(".img-" + id).classList.add("d-none");
   }
-};
-onMounted(() => {
-  if (props.fromPost) getComment();
-});
-/// NOTE - this for creation post */
-let bodyInput = ref("");
-let sendPostBtn = ref(null);
-let imageInput = ref(null);
-let invalidBody = ref(null);
-let textArea = ref(null);
-const username = ref(null);
-const userProfile = ref(null);
-const userData = localStorage.getItem("userData");
-if (userData) {
-  username.value = JSON.parse(localStorage.getItem("userData")).user.name;
-  userProfile.value = JSON.parse(
-    localStorage.getItem("userData")
-  ).user.profile_image;
-}
-let getImage = (e) => {
-  let file = e.target.files;
-  if (file.length > 0) {
-    imageInput.value = file[0];
-  }
-};
-const createPost = () => {
-  const myHeaders = {
-    Accept: "application/json",
-    "Content-Type": "multipart/form-data",
-    Authorization: `Bearer ${JSON.parse(userData).token}`,
-  };
-  let formdata = new FormData();
-  formdata.append("body", bodyInput.value);
-  if (imageInput.value != null) formdata.append("image", imageInput.value);
-  axios
-    .post("https://tarmeezacademy.com/api/v1/posts", formdata, {
-      headers: myHeaders,
-    })
-    .then((res) => {
-      console.log(res.data.data);
-      postsData.value.unshift(res.data.data);
-      bodyInput.value = "";
-      // ++user.value.posts_count;
-      imageInput.value = null;
-    })
-    .catch((err) => {
-      console.log(err);
-      invalidBody.value.innerHTML = err.response.data.message;
-    });
-};
-const chaneHeightCreatePost = () => {
-  if (textArea.value.value == "") textArea.value.style.height = "60px";
-  if (textArea.value.scrollHeight <= 200)
-    textArea.value.style.height = textArea.value.scrollHeight + "px";
 };
 </script>
 
@@ -674,66 +440,6 @@ const chaneHeightCreatePost = () => {
   }
 }
 
-.comment-section {
-  background-color: #f0f2f5;
-  bottom: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  align-items: center;
-  padding-bottom: 5px;
-  .comment-input {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    textarea {
-      box-shadow: 0 0px 5px 0px rgba(0, 0, 0, 0.3);
-      position: relative;
-      padding: 15px 45px 10px 60px;
-      width: 100%;
-      height: 60px;
-      border-radius: 5px;
-      resize: none;
-      &:focus {
-        outline: 1px solid #2790fa9c;
-      }
-    }
-  }
-  .user-info,
-  .send-comment {
-    position: absolute;
-    z-index: 2;
-  }
-  .user-info {
-    left: 20px;
-  }
-  .send-comment {
-    cursor: pointer;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #0080ff; // disabled => #8ebdec
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-    transition: 0.2s;
-    &:focus {
-      // background-color: red;
-      outline: 1px solid #908f8f;
-      background-color: #fff;
-      .send-icon {
-        color: #0080ff;
-      }
-    }
-    .send-icon {
-      color: #fff;
-    }
-  }
-}
 .arrow-up {
   bottom: 15px;
   right: 50px;
@@ -751,12 +457,6 @@ const chaneHeightCreatePost = () => {
   .share {
     display: none;
   }
-  .comment-section .comment-input textarea {
-    font-size: 12px;
-  }
-  .comments-view .text {
-    font-size: 14px !important;
-  }
 }
 @media (max-width: 991px) {
   .container {
@@ -767,10 +467,6 @@ const chaneHeightCreatePost = () => {
   }
   .posts .post footer {
     font-size: 12px;
-  }
-  .arrow-up {
-    bottom: 75px;
-    right: 10px;
   }
 }
 @media (min-width: 992px) {

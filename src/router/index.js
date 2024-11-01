@@ -1,9 +1,9 @@
 import HomePage from "@/views/homePage.vue";
-import ProfilePage from "@/views/profilePage.vue";
 import loginPage from "@/views/loginPage.vue";
 import RegisterPage from "@/views/registerPage.vue";
 import viewPost from "@/views/viewPost.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import UserProfile from "@/views/UserProfilePage.vue";
 
 const routes = [
   {
@@ -12,14 +12,6 @@ const routes = [
     component: HomePage,
     meta: {
       title: "Home Page",
-    },
-  },
-  {
-    path: "/profile",
-    name: "profile",
-    component: ProfilePage,
-    meta: {
-      title: "Profile Page",
     },
   },
   {
@@ -36,6 +28,14 @@ const routes = [
     component: RegisterPage,
     meta: {
       title: "Register",
+    },
+  },
+  {
+    path: "/profile/:id",
+    name: "user profile",
+    component: UserProfile,
+    meta: {
+      title: "User Profile",
     },
   },
   {

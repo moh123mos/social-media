@@ -147,16 +147,18 @@ import axios from "axios";
 import { ref } from "vue";
 import { userDataPublic } from "@/store/users";
 import navBar from "@/components/navBar.vue";
+import { storeToRefs } from "pinia";
 
 let invalidUsername = ref(null);
 let invalidPassword = ref(null);
 let invalidEmail = ref(null);
 const body = ref({
-  username: "moh289mos",
-  password: "moh289mos",
+  username: "",
+  password: "",
 });
 
 const store = userDataPublic();
+const { myAccount } = storeToRefs(store);
 const loginVx = store.login;
 const login = () => {
   axios
@@ -165,6 +167,7 @@ const login = () => {
       console.log(res.data);
       localStorage.setItem("userData", JSON.stringify(res.data));
       loginVx();
+      myAccount.value = res.data;
       router.push("/");
     })
     .catch((error) => {

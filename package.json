@@ -13,11 +13,10 @@
     "bootstrap-icons": "^1.11.3",
     "bootstrap-vue": "^2.23.1",
     "core-js": "^3.8.3",
-    "lodash": "^4.17.21",
     "pinia": "^2.2.2",
+    "vite": "^5.4.2",
     "vue": "^3.4.38",
-    "vue-router": "^4.0.3",
-    "vuex": "^4.0.0"
+    "vue-router": "^4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
